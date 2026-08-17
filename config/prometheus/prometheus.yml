@@ -1,0 +1,25 @@
+# Scrape config for the HomePilot core stack.
+#
+# Targets are container names on the `homepilot` network, so this works
+# unchanged regardless of which host ports you mapped.
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # Host CPU / memory / filesystem. Feeds HomePilot's CPU, Memory and
+  # Disk KPI cards.
+  - job_name: node-exporter
+    static_configs:
+      - targets: ["homepilot-node-exporter:9100"]
+
+  # Per-container state, from the container API rather than cgroups.
+  # Feeds the Containers KPI card via container_running.
+  - job_name: container-exporter
+    static_configs:
+      - targets: ["homepilot-container-exporter:9101"]

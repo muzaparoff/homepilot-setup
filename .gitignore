@@ -1,0 +1,30 @@
+# ─── Secrets ───────────────────────────────────────────────────────────
+# setup.sh generates .env with freshly-random API keys and passwords.
+# It must never be committed. This rule is deliberately first: the usual
+# way secrets leak is a .gitignore added *after* the file was already
+# tracked, at which point the rule no longer applies to it.
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.ovpn
+secrets/
+
+# ─── Runtime state ─────────────────────────────────────────────────────
+# Container config/data lives outside the repo by default (HOMEPILOT_DATA),
+# but ignore these in case someone points it here.
+#
+# Anchored with a leading slash on purpose: an unanchored `media/` matches
+# a directory of that name at ANY depth, which silently excluded
+# stacks/media/ — the entire media module — from the repo.
+/data/
+/appdata/
+/media/
+/downloads/
+
+# ─── OS / editor ───────────────────────────────────────────────────────
+.DS_Store
+.idea/
+.vscode/
+*.swp

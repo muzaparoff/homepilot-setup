@@ -1,0 +1,14 @@
+# Points Grafana at the stack's own Prometheus on first boot, so there's
+# no datasource to configure by hand before a dashboard will render.
+
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://homepilot-prometheus:9090
+    isDefault: true
+    editable: true
+    jsonData:
+      timeInterval: 15s

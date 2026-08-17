@@ -1,0 +1,25 @@
+# Podman overrides for the core stack.
+#
+# Applied by setup.sh only when the API server reports "Podman Engine".
+# Layered on top of compose.yaml with a second -f, so the base file stays
+# clean for the Docker Desktop / OrbStack / Colima majority.
+#
+# Why this is needed, measured on Podman Engine 5.7 / macOS:
+#   /run/podman/podman.sock is srw-rw---- root:root, and rootless userns
+#   maps container-root to an unprivileged user inside the VM. A plain
+#   root container gets EACCES on the socket. `user: "0:0"` alone is still
+#   denied. Only privileged mode succeeds — at which point the container
+#   can query the API normally.
+#
+# Docker Desktop and OrbStack expose a socket the container can read
+# without this, so they must not get these flags.
+
+services:
+  dockge:
+    privileged: true
+    user: "0:0"
+
+  # Same socket, same permission wall.
+  container-exporter:
+    privileged: true
+    user: "0:0"
