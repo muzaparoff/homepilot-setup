@@ -1,0 +1,47 @@
+# HomePilot Notifier — opt-in, enabled with: ./setup.sh --with-notifications
+#
+# Watches qBittorrent (torrent finished), Prometheus (CPU/RAID thresholds),
+# and arbitrary HTTP probes (service down/up), and pushes native APNs
+# notifications to the HomePilot app. The app registers its device token
+# against this container directly — no third-party push relay.
+#
+# Source is vendored from HomePilot/notifier/ (the app repo) rather than
+# built from a cross-repo path: this kit is meant to work standalone, and a
+# user following it has no guarantee the app repo is cloned alongside it.
+#
+# Needs an Apple-issued APNs auth key — nothing here can generate one.
+# See ../../README.md "Push notifications" for the one-time ASC steps.
+
+name: homepilot-notifier
+
+services:
+  homepilot-notifier:
+    build: .
+    image: homepilot/notifier:1
+    container_name: homepilot-notifier
+    restart: unless-stopped
+    ports:
+      - "${NOTIFIER_PORT:-8899}:8899"
+    environment:
+      APNS_KEY_PATH: /keys/apns-key.p8
+      APNS_KEY_ID: ${APNS_KEY_ID:?set this in .env — see README "Push notifications"}
+      APNS_TEAM_ID: ${APNS_TEAM_ID:?set this in .env}
+      APNS_TOPIC: ${APNS_TOPIC:-com.homepilot.HomePilot}
+      # Container-name URLs on the shared `homepilot` network — not the LAN
+      # IP, so this works unchanged regardless of which host ports you mapped.
+      QBIT_URL: http://homepilot-qbittorrent:8081
+      QBIT_USER: admin
+      QBIT_PASS: ${QBITTORRENT_PASSWORD:-}
+      PROM_URL: http://homepilot-prometheus:9090
+      CPU_THRESHOLD: "90"
+      PROBE_URLS: "Dockge=http://homepilot-dockge:5001,qBittorrent=http://homepilot-qbittorrent:8081"
+      POLL_SECONDS: "60"
+    volumes:
+      - ${APNS_KEY_FILE:-./stacks/notifier/apns-key.p8}:/keys/apns-key.p8:ro
+      - ${HOMEPILOT_DATA:-./data}/notifier:/data
+    networks: [homepilot]
+
+networks:
+  homepilot:
+    name: homepilot
+    external: true

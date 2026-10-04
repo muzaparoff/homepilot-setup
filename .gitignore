@@ -8,6 +8,7 @@
 !.env.example
 *.key
 *.pem
+*.p8
 *.ovpn
 secrets/
 

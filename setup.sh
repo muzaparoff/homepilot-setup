@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # HomePilot server setup.
 #
-#   ./setup.sh                 core stack: Dockge, Prometheus, Grafana
-#   ./setup.sh --with-media    also *arr + qBittorrent, wired together
-#   ./setup.sh --down          stop everything (keeps data and .env)
+#   ./setup.sh                        core stack: Dockge, Prometheus, Grafana
+#   ./setup.sh --with-media           also *arr + qBittorrent, wired together
+#   ./setup.sh --with-notifications   push notifications (needs an APNs key — see README)
+#   ./setup.sh --down                 stop everything (keeps data and .env)
 #
 # Safe to re-run. Existing secrets are preserved, so a second run will not
 # rotate a key that a running service — or your phone — already holds.
@@ -19,12 +20,14 @@ cd "$ROOT"
 . "$ROOT/lib/env.sh"
 
 WITH_MEDIA=0
+WITH_NOTIFICATIONS=0
 ACTION="up"
 
 while [ $# -gt 0 ]; do
     case "$1" in
-        --with-media) WITH_MEDIA=1 ;;
-        --down)       ACTION="down" ;;
+        --with-media)          WITH_MEDIA=1 ;;
+        --with-notifications)  WITH_NOTIFICATIONS=1 ;;
+        --down)                ACTION="down" ;;
         -h|--help)
             sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//'
             exit 0 ;;
@@ -58,6 +61,9 @@ fi
 if [ "$WITH_MEDIA" = "1" ]; then
     COMPOSE_FILES="$COMPOSE_FILES -f stacks/media/compose.yaml"
 fi
+if [ "$WITH_NOTIFICATIONS" = "1" ]; then
+    COMPOSE_FILES="$COMPOSE_FILES -f stacks/notifier/compose.yaml"
+fi
 
 # shellcheck disable=SC2086
 compose() { $HP_COMPOSE --project-directory "$ROOT" $COMPOSE_FILES "$@"; }
@@ -82,6 +88,19 @@ fi
 # shellcheck source=/dev/null
 set -a; . "$ROOT/.env"; set +a
 
+if [ "$WITH_NOTIFICATIONS" = "1" ]; then
+    MISSING=""
+    [ -f "$ROOT/stacks/notifier/apns-key.p8" ] || MISSING="${MISSING}  - stacks/notifier/apns-key.p8 (the downloaded .p8)\n"
+    [ -n "${APNS_KEY_ID:-}" ]  || MISSING="${MISSING}  - APNS_KEY_ID in .env\n"
+    [ -n "${APNS_TEAM_ID:-}" ] || MISSING="${MISSING}  - APNS_TEAM_ID in .env\n"
+    if [ -n "$MISSING" ]; then
+        echo "" >&2
+        echo "--with-notifications needs these first (see README.md \"Push notifications\"):" >&2
+        printf "%b" "$MISSING" >&2
+        exit 1
+    fi
+fi
+
 # ── 3. Directories ─────────────────────────────────────────────────────
 # Created up front so the containers don't create them as root, which on
 # Podman lands them owned by a user you can't easily delete afterwards.
@@ -92,6 +111,9 @@ if [ "$WITH_MEDIA" = "1" ]; then
     mkdir -p "${HOMEPILOT_DATA}"/{sonarr,radarr,prowlarr,qbittorrent}
     mkdir -p "${MEDIA_ROOT}"/torrents/{tv,movies}
     mkdir -p "${MEDIA_ROOT}"/media/{tv,movies}
+fi
+if [ "$WITH_NOTIFICATIONS" = "1" ]; then
+    mkdir -p "${HOMEPILOT_DATA}/notifier"
 fi
 ok "under ${HOMEPILOT_DATA}"
 
@@ -156,6 +178,10 @@ if [ "$WITH_MEDIA" = "1" ]; then
     hp_wire_all
 fi
 
+if [ "$WITH_NOTIFICATIONS" = "1" ]; then
+    wait_for "Notifier" "http://localhost:${NOTIFIER_PORT}/healthz" 60 || true
+fi
+
 # ── 7. Summary ─────────────────────────────────────────────────────────
 LAN_IP=$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null || echo "127.0.0.1")
 
@@ -191,6 +217,16 @@ cat <<EOF
 
     Indexers are not configured — add them in Prowlarr and it pushes
     them to Sonarr and Radarr automatically.
+EOF
+fi
+
+if [ "$WITH_NOTIFICATIONS" = "1" ]; then
+cat <<EOF
+
+    Notifications  http://${LAN_IP}:${NOTIFIER_PORT}/healthz
+                         Enable in HomePilot: Settings → Notifications.
+                         The app registers its device token with this
+                         container directly — no third-party push relay.
 EOF
 fi
 

@@ -11,7 +11,9 @@ cd homepilot-setup
 ```
 
 That's the core stack: container management and metrics. Add the media
-services with `./setup.sh --with-media`.
+services with `./setup.sh --with-media`, and push notifications with
+`./setup.sh --with-notifications` (needs an Apple-issued key first — see
+[Push notifications](#push-notifications) below).
 
 Already have a server? You probably don't need this — see
 [docs/CREDENTIALS.md](docs/CREDENTIALS.md), which lists what HomePilot
@@ -39,8 +41,18 @@ With `--with-media`:
 | Radarr | 7878 | Media → Movies |
 | Prowlarr | 9696 | Media → Search |
 
+With `--with-notifications`:
+
+| Service | Port | What it does |
+|---|---|---|
+| Notifier | 8899 | Pushes torrent-finished / CPU-RAID / service-down alerts to the app |
+
 Ports match HomePilot's built-in defaults, so there is nothing to change
-in the app. Override any of them in `.env`.
+in the app. Override any of them in `.env`. One exception: HomePilot
+itself defaults to port 8080 for qBittorrent (the linuxserver image's own
+stock default) and automatically tries 8081 if that fails — this kit
+still installs qBittorrent on 8081 as shown above, and the app's fallback
+probe covers the difference either way.
 
 ## What the setup actually does
 
@@ -91,12 +103,36 @@ the container cgroups live in a user slice it can't enumerate, so it
 reports a single `id="/"` series and nothing else. Querying the
 Docker-compatible API instead behaves the same on every engine.
 
+## Push notifications
+
+Only needed for `--with-notifications`. Nothing in this step can be
+generated for you — it comes from an Apple-issued key tied to your own
+developer account:
+
+1. [App Store Connect → Agreements](https://appstoreconnect.apple.com/agreements) —
+   accept any pending agreement first. While one is pending, Apple blocks
+   the APIs the next step needs.
+2. [developer.apple.com → Certificates, Identifiers & Profiles → Keys](https://developer.apple.com/account/resources/authkeys/list) →
+   "+" → check **Apple Push Notifications service (APNs)** → register →
+   download the `.p8`. This download only works once — if you lose it,
+   you revoke the key and make a new one, you can't re-download it.
+3. Save it as `stacks/notifier/apns-key.p8`.
+4. Set `APNS_KEY_ID` and `APNS_TEAM_ID` in `.env` (both from the portal
+   page you were just on).
+5. `./setup.sh --with-notifications`.
+6. In HomePilot: Settings → Notifications → enable. The screen shows a
+   registration error directly if the container can't be reached.
+
+The container only ever talks to your own phone's device token — no
+third-party push relay sees your data.
+
 ## Everyday use
 
 ```bash
-./setup.sh                # start, or re-apply config
-./setup.sh --with-media   # include the media services
-./setup.sh --down         # stop everything, keep data and .env
+./setup.sh                        # start, or re-apply config
+./setup.sh --with-media           # include the media services
+./setup.sh --with-notifications   # include push notifications
+./setup.sh --down                 # stop everything, keep data and .env
 ```
 
 Credentials are printed at the end of every run and stored in `.env`
