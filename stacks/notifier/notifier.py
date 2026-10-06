@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-HomePilot Notifier — companion container that watches home-server services
-and sends APNs push notifications to registered HomePilot installs.
+Shellpocket Notifier — companion container that watches home-server services
+and sends APNs push notifications to registered Shellpocket installs.
 
 Watches:
   * qBittorrent  — torrent finished downloading

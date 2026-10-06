@@ -1,8 +1,8 @@
-# HomePilot Notifier — opt-in, enabled with: ./setup.sh --with-notifications
+# Shellpocket Notifier — opt-in, enabled with: ./setup.sh --with-notifications
 #
 # Watches qBittorrent (torrent finished), Prometheus (CPU/RAID thresholds),
 # and arbitrary HTTP probes (service down/up), and pushes native APNs
-# notifications to the HomePilot app. The app registers its device token
+# notifications to the Shellpocket app. The app registers its device token
 # against this container directly — no third-party push relay.
 #
 # Source is vendored from HomePilot/notifier/ (the app repo) rather than

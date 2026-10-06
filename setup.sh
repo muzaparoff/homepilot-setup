@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# HomePilot server setup.
+# Shellpocket server setup.
 #
 #   ./setup.sh                        core stack: Dockge, Prometheus, Grafana
 #   ./setup.sh --with-media           also *arr + qBittorrent, wired together
@@ -188,7 +188,7 @@ LAN_IP=$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/nul
 step "Done"
 cat <<EOF
 
-  Open HomePilot and enter this as your server address:
+  Open Shellpocket and enter this as your server address:
 
       ${LAN_IP}
 
@@ -224,7 +224,7 @@ if [ "$WITH_NOTIFICATIONS" = "1" ]; then
 cat <<EOF
 
     Notifications  http://${LAN_IP}:${NOTIFIER_PORT}/healthz
-                         Enable in HomePilot: Settings → Notifications.
+                         Enable in Shellpocket: Settings → Notifications.
                          The app registers its device token with this
                          container directly — no third-party push relay.
 EOF

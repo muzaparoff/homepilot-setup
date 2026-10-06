@@ -21,7 +21,7 @@ Emits
     container_total                       containers known, any state
     container_exporter_up                 1 when the API answered
 
-`container_running` is deliberately the name HomePilot's Containers KPI
+`container_running` is deliberately the name Shellpocket's Containers KPI
 queries first, so the card works with no app-side change.
 """
 

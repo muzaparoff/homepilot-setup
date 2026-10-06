@@ -1,13 +1,13 @@
-# HomePilot core stack — container management and metrics.
+# Shellpocket core stack — container management and metrics.
 #
-# Ports match HomePilot's built-in defaults, so the app connects with no
+# Ports match Shellpocket's built-in defaults, so the app connects with no
 # port editing. Relative paths resolve from the repo root: setup.sh always
 # passes --project-directory.
 
 name: homepilot-core
 
 services:
-  # Container manager. HomePilot's Stacks tab speaks to this over Socket.IO.
+  # Container manager. Shellpocket's Stacks tab speaks to this over Socket.IO.
   dockge:
     image: louislam/dockge:1
     container_name: homepilot-dockge
@@ -50,7 +50,7 @@ services:
       - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:?run ./setup.sh to generate}
       - GF_USERS_ALLOW_SIGN_UP=false
-      # HomePilot opens dashboards inside a WKWebView, which Grafana refuses
+      # Shellpocket opens dashboards inside a WKWebView, which Grafana refuses
       # to render unless embedding is allowed.
       - GF_SECURITY_ALLOW_EMBEDDING=true
     volumes:
@@ -74,7 +74,7 @@ services:
       - "${NODE_EXPORTER_PORT:-9100}:9100"
     networks: [homepilot]
 
-  # Per-container state. Feeds HomePilot's Containers KPI card.
+  # Per-container state. Feeds Shellpocket's Containers KPI card.
   #
   # This replaces cAdvisor deliberately. cAdvisor reads cgroups, and under
   # rootless Podman the container cgroups sit in a user slice it cannot

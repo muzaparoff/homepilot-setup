@@ -1,4 +1,4 @@
-# Scrape config for the HomePilot core stack.
+# Scrape config for the Shellpocket core stack.
 #
 # Targets are container names on the `homepilot` network, so this works
 # unchanged regardless of which host ports you mapped.
@@ -12,7 +12,7 @@ scrape_configs:
     static_configs:
       - targets: ["localhost:9090"]
 
-  # Host CPU / memory / filesystem. Feeds HomePilot's CPU, Memory and
+  # Host CPU / memory / filesystem. Feeds Shellpocket's CPU, Memory and
   # Disk KPI cards.
   - job_name: node-exporter
     static_configs:

@@ -1,10 +1,10 @@
-# What HomePilot needs, and where to find it
+# What Shellpocket needs, and where to find it
 
 For people who already run a homelab and just want the app connected.
 If you used `./setup.sh`, all of this was handled for you and printed at
 the end of the run — this page is for everyone else.
 
-HomePilot asks for one server address during onboarding, then each tab
+Shellpocket asks for one server address during onboarding, then each tab
 asks for its own credentials the first time you open it.
 
 ---
@@ -45,9 +45,9 @@ docker logs <qbittorrent-container> 2>&1 | grep -i "temporary password"
 Set a permanent one in the WebUI under **Tools → Options → Web UI**,
 otherwise it changes on every restart and the app loses access.
 
-> HomePilot defaults to **8081**. The linuxserver image defaults to 8080,
-> so if you used that image unchanged, either set `WEBUI_PORT=8081` or
-> change the port in the app.
+> Shellpocket defaults to **8080**, the linuxserver image's own default, and
+> tries **8081** automatically if 8080 doesn't answer. Any other port: set
+> it in the app under Settings → Services & Ports.
 
 ### Sonarr — Media → TV Shows
 **Default port 8989** · API key
@@ -75,7 +75,7 @@ otherwise it changes on every restart and the app loses access.
 ### Prometheus — Metrics tab
 **Default port 9090** · No authentication
 
-HomePilot runs four queries. The first three are standard node-exporter:
+Shellpocket runs four queries. The first three are standard node-exporter:
 
 | Card | Query |
 |---|---|
@@ -91,7 +91,7 @@ query in Prometheus directly — you're most likely missing an exporter.
 ### Grafana — Metrics tab
 **Default port 3000** · Admin user and password
 
-HomePilot lists your dashboards by calling `/api/search`. Most Grafana
+Shellpocket lists your dashboards by calling `/api/search`. Most Grafana
 installs require authentication for that, in which case the app shows a
 single **Open Grafana** link instead and you browse in the embedded
 browser, signing in once.
@@ -108,7 +108,7 @@ or `GF_SECURITY_ALLOW_EMBEDDING=true` as an environment variable.
 ### SSH — Terminal tab
 **Default port 22** · Username and password, or an ed25519 private key
 
-Nothing HomePilot-specific. The same credentials also power SFTP browsing
+Nothing Shellpocket-specific. The same credentials also power SFTP browsing
 in the iOS Files app.
 
 ---

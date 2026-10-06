@@ -1,6 +1,6 @@
-# HomePilot server setup
+# Shellpocket server setup
 
-One command to stand up the services [HomePilot](https://apps.apple.com/app/homepilot) connects to,
+One command to stand up the services [Shellpocket](https://apps.apple.com/app/id6762549901) connects to,
 on a Mac mini or any machine with a container runtime — configured so the
 app works without you copying a single API key.
 
@@ -16,7 +16,7 @@ services with `./setup.sh --with-media`, and push notifications with
 [Push notifications](#push-notifications) below).
 
 Already have a server? You probably don't need this — see
-[docs/CREDENTIALS.md](docs/CREDENTIALS.md), which lists what HomePilot
+[docs/CREDENTIALS.md](docs/CREDENTIALS.md), which lists what Shellpocket
 expects on each port and exactly where to find each credential in the
 service's own UI.
 
@@ -24,7 +24,7 @@ service's own UI.
 
 ## What it runs
 
-| Service | Port | What HomePilot uses it for |
+| Service | Port | What Shellpocket uses it for |
 |---|---|---|
 | Dockge | 5001 | Stacks tab — start, stop and restart containers |
 | Prometheus | 9090 | Metrics tab — the four KPI cards |
@@ -47,8 +47,8 @@ With `--with-notifications`:
 |---|---|---|
 | Notifier | 8899 | Pushes torrent-finished / CPU-RAID / service-down alerts to the app |
 
-Ports match HomePilot's built-in defaults, so there is nothing to change
-in the app. Override any of them in `.env`. One exception: HomePilot
+Ports match Shellpocket's built-in defaults, so there is nothing to change
+in the app. Override any of them in `.env`. One exception: Shellpocket
 itself defaults to port 8080 for qBittorrent (the linuxserver image's own
 stock default) and automatically tries 8081 if that fails — this kit
 still installs qBittorrent on 8081 as shown above, and the app's fallback
@@ -92,7 +92,7 @@ Mac's SSD or an attached array.
 
 If you have a RAID or external volume you want on that card, publish a
 `host_filesystem_avail_bytes{mount="raid"}` series from the host — a
-textfile collector on a cron is enough. HomePilot prefers that series
+textfile collector on a cron is enough. Shellpocket prefers that series
 when it exists and falls back to the VM's root filesystem when it
 doesn't.
 
@@ -120,7 +120,7 @@ developer account:
 4. Set `APNS_KEY_ID` and `APNS_TEAM_ID` in `.env` (both from the portal
    page you were just on).
 5. `./setup.sh --with-notifications`.
-6. In HomePilot: Settings → Notifications → enable. The screen shows a
+6. In Shellpocket: Settings → Notifications → enable. The screen shows a
    registration error directly if the container can't be reached.
 
 The container only ever talks to your own phone's device token — no
@@ -156,7 +156,7 @@ show no stacks. Open an issue with the output of `docker version`, which
 identifies the engine behind the CLI.
 
 **A port is already in use** — change it in `.env` and re-run, then set
-the matching port in HomePilot under Settings → Services & Ports.
+the matching port in Shellpocket under Settings → Services & Ports.
 
 ## Licence
 

@@ -126,7 +126,7 @@ with open(sys.argv[1], "w") as fh:
         "[Preferences]\n"
         "WebUI\\Username=admin\n"
         f"WebUI\\Password_PBKDF2=\"{encoded}\"\n"
-        # HomePilot is a native client and sends neither Origin nor Referer,
+        # Shellpocket is a native client and sends neither Origin nor Referer,
         # which qBittorrent's CSRF check treats as same-site. Host header
         # validation stays on; this only relaxes the domain allowlist so the
         # LAN IP works without editing anything.
